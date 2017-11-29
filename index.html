@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>体重记录</title>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+</head>
+<body style="padding: 20px;">
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-3 col-md-offset-4 form-group">
+            <div class="input-group">
+                <input type="text" class="form-control tody-weight" placeholder="今日体重">
+                <span class="input-group-btn"><button class="btn btn-primary add-weight" type="button">Add!</button></span>
+            </div>
+        </div>
+        <div class="col-md-3 col-md-offset-4">
+            <table class="table table-striped">
+                <caption>Weight-List By Ms.Wang <a class="btn btn-info btn-xs" href="line.html" role="button">View
+                    Line</a></caption>
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>时间</th>
+                    <th>体重</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody class="weight-body">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</body>
+<script src="./static/js/jquery-2.2.4.min.js"></script>
+
+<script>
+    function loadWeight() {
+        $.ajax({
+            type: 'POST',
+            url: 'api.php',
+            timeout: 100000,
+            dataType: 'json',
+            success: function (data) {
+                for (var e in data) {
+                    var tr = '<tr><th scope="row">' + data[e].id + '</th>' +
+                            '<td>' + data[e].date + '</td>' +
+                            '<td>' + data[e].weight + '</td>' +
+                            '<td><button type="button" class="btn btn-danger btn-xs remove-weight">Delete</button></td></tr>';
+
+                    $(".weight-body").append(tr)
+                }
+            },
+            beforeSend: function () {
+            },
+            error: function () {
+            },
+            complete: function () {
+            }
+        })
+    }
+    $(function () {
+        loadWeight()
+        $(".add-weight").click(function () {
+            var tody_weight = $(".tody-weight").val()
+            $.ajax({
+                type: 'POST',
+                url: 'api.php?m=add',
+                data: {
+                    weight: tody_weight
+                },
+                timeout: 100000,
+                dataType: 'json',
+                success: function (data) {
+                    $(".weight-body tr").remove()
+                    loadWeight()
+                },
+                beforeSend: function () {
+                },
+                error: function () {
+                },
+                complete: function () {
+                }
+            })
+        })
+
+        $(document).on('click','.remove-weight',function () {
+            var parentTr = $(this).parents('tr')
+            var id = parentTr.find('th').text()
+            $.ajax({
+                type: 'POST',
+                url: 'api.php?m=remove',
+                data: {
+                    id: id
+                },
+                timeout: 100000,
+                dataType: 'json',
+                success: function (data) {
+                    parentTr.remove()
+                },
+                beforeSend: function () {
+                },
+                error: function () {
+                },
+                complete: function () {
+                }
+            })
+        })
+
+    })
+</script>
+
+</html>

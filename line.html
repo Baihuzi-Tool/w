@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>曲线</title>
+</head>
+<body>
+<canvas id="canvas" height="450" style="width: 90%;margin: auto;min-width: 600px"></canvas>
+
+</body>
+<script src="./static/js/jquery-2.2.4.min.js"></script>
+<script src="./static/js/Chart.js"></script>
+
+<script>
+    var char, myLine
+    var lineChartData = []
+    function loadWeight() {
+        $.ajax({
+            type: 'POST',
+            url: 'api.php?m=all',
+            data: {},
+            timeout: 100000,
+            dataType: 'json',
+            success: function (data) {
+                var canvasWidth = 600
+                var weights = []
+                for (var i in data['weights']) {
+                    weights.push(parseFloat(data['weights'][i]))
+                }
+                canvasWidth = weights.length * 15 + canvasWidth
+
+                lineChartData = {
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            fillColor: "rgba(151,187,205,0.5)",
+                            strokeColor: "rgba(151,187,205,1)",
+                            pointColor: "rgba(151,187,205,1)",
+                            pointStrokeColor: "#fff",
+                            data: weights
+                        }
+                    ]
+
+                }
+                $("#canvas").attr('width', canvasWidth + "px")
+                char = new Chart($("#canvas").get(0).getContext("2d"))
+                myLine = char.Line(lineChartData);
+            },
+            beforeSend: function () {
+            },
+            error: function () {
+            },
+            complete: function () {
+            }
+        })
+    }
+    $(function () {
+        loadWeight()
+    })
+</script>
+</html>
